@@ -128,4 +128,5 @@ MasterKeyMap = {
     '"[-':'"[^',
     ".dedent(": ".unindent(",
     "bool(": "parseBool(",
+    " is not nil:": " isnot nil:"
 }

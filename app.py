@@ -4,7 +4,40 @@ import os
 from function_converter import FunctionConverter, convert_all_functions
 from class_converter import ClassConverter, convert_all_classes
 from import_fixer import get_imports
+import re
 
+
+def count_spaces_until_first_letter(input_string):
+    space_count = 0
+    for char in input_string:
+        if char.isspace():
+            space_count += 1
+        else:
+            break  # Exit loop when the first non-space character is encountered
+    return space_count
+
+def var_assignment_for_strings(filepath:str):
+    with open(filepath, 'r') as file:
+        lines = file.readlines()
+
+    modified_lines = []
+    assignment_pattern = re.compile(r'(\w+)\s*=\s*("[^"\\]*(?:\\.[^"\\]*)*"|\'[^\'\\]*(?:\\.[^\'\\]*)*\')')
+
+    for line in lines:
+        match = assignment_pattern.search(line)
+        if match:
+            assign_line = line.index("=")
+            front = line[0:assign_line]
+            sc = count_spaces_until_first_letter(front)
+            space = sc * " "
+            back = line[assign_line:]
+            myline = space + "var " + front.strip() + ": string " + back
+            modified_lines.append(myline)
+        else:
+            modified_lines.append(line)
+
+    with open(filepath, 'w') as file:
+        file.writelines(modified_lines)
 
 def convert_python_source_to_nim_source(filepath: str, outfile:str=None) -> None:
     """
@@ -56,6 +89,10 @@ import tables
     print("[py2nim]: saving ", newfile)
     with open(newfile, "w") as wfile:
         wfile.write(start_string)
+
+    var_assignment_for_strings(newfile)
+
+
 
 
 def main():
