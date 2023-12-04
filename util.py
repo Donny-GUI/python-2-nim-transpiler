@@ -2,10 +2,34 @@ import ast
 import re 
 from string import ascii_letters, digits
 import os
+import shutil 
 
 
 WordCharacters = ascii_letters + digits
 
+def replicate_directory_structure(source_dir='.', target_dir='project_nim'):
+    # Get the absolute paths of source and target directories
+    source_dir = os.path.abspath(source_dir)
+    target_dir = os.path.abspath(target_dir)
+
+    # Create the target directory if it doesn't exist
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    # Walk through the source directory and replicate the structure
+    for root, dirs, files in os.walk(source_dir):
+        # Create corresponding directories in the target directory
+        relative_path = os.path.relpath(root, source_dir)
+        target_root = os.path.join(target_dir, relative_path)
+        if not os.path.exists(target_root):
+            os.makedirs(target_root)
+
+        # Copy files to the target directory
+        for file in files:
+            source_path = os.path.join(root, file)
+            target_path = os.path.join(target_root, file)
+            shutil.copy2(source_path, target_path)
+    return target_dir
 
 def get_module_filepath(module_name: str):
     try:

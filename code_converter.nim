@@ -268,13 +268,13 @@ proc convertAssignToNim(node: nil = nil): nil =
     raise ValueError("Input must be an ast.Assign node")
   if isinstance(node.value, ast.Constant):
     return convert_constant_to_nim(node)
-  targets = @[]
+  var targets: seq = @[]
   for x in node.targets:
     if isinstance(x, ast.Constant):
       targets.add(convert_constant_to_nim(x))
     else:
       targets.add(convert_expr_to_nim(x))
-  values = @[]
+  var values: seq = @[]
   if isinstance(node.value, ast.IfExp):
     return
   if isinstance(node.value, ast.BinOp):
@@ -285,7 +285,7 @@ proc convertAssignToNim(node: nil = nil): nil =
     except AttributeError:
       if isinstance(value, ast.Constant):
         values.add(convert_constant_to_nim(value))
-  nim_assignments = @[]
+  var nim_assignments: seq = @[]
   for target, value in zip(targets, values):
     nim_assignment = fmt"{target} = {value}"
     nim_assignments.add(nim_assignment)
@@ -420,7 +420,7 @@ proc convertTryToNim(node: nil = nil): nil =
 proc convertExceptsToNim(handlers: nil = nil): nil = 
   if not handlers:
     return ""
-  nim_excepts = @[]
+  var nim_excepts: seq = @[]
   for handler in handlers:
     except_type = convert_expr_to_nim(handler.type)
     except_body = convert_body_to_nim(handler.body)
@@ -439,7 +439,7 @@ proc convertAssertToNim(node: nil = nil): nil =
 proc convertImportToNim(node: nil = nil): nil = 
   if not isinstance(node, ast.Import):
     raise ValueError("Input must be an ast.Import node")
-  nim_import_statements = @[]
+  var nim_import_statements: seq = @[]
   for alias in node.names:
     module_name = convert_alias_to_nim(alias)
     nim_import_statements.add(fmt"import {module_name}")
@@ -510,7 +510,7 @@ proc convertModuleToNim(node: nil = nil): nil =
   return module_name
 
 proc convertImportedNamesToNim(names: nil = nil): nil = 
-  nim_imported_names = @[]
+  var nim_imported_names: seq = @[]
   for alias in names:
     nim_imported_names.add(convert_alias_to_nim(alias))
   return ", ".join(nim_imported_names)
@@ -543,8 +543,8 @@ proc convertValueToNimLiteral(value: nil = nil): nil =
     return "nil"
   elif value.value == 0:
     return "0"
-  elif lit == """" or value.value == """":
-    return """"
+  elif lit == "" or value.value == "":
+    return ""
   else:
     raise ValueError(fmt"Unsupported constant value: {value}")
 
