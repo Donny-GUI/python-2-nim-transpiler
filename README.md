@@ -29,11 +29,17 @@ The follow is  a description of the workflow for transpiling the python source t
 
 1. Read the python source
 2. Parse all the Class Definition nodes
+   
    2.1. parse all class inits
+   
    2.2. parse all the methods
+   
    2.3. make the type definitions
+   
    2.4. make the initializers
+   
    2.5. make all the func methods
+   
 3. parse all the imports
    3.1. Map the imports to their nim equivalents
 4. Parse all the python function nodes
