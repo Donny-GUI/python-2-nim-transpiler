@@ -1,10 +1,24 @@
 import ast
 from method_analyzer import MethodAnalyzer
 from value_analyzer import ValueAnalyzer
+from typing import Optional, List, Dict
 
 
 class InitializerAnalyzer(MethodAnalyzer):
-    def __init__(self, node: ast.FunctionDef=None):
+    """
+    Analyzes an initializer method (__init__) in a Python class.
+
+    Attributes:
+    - class_properties (List[Tuple[str, Optional[str], ast.AST, ast.ctx]]): List of class properties.
+    - body (List[str]): List of unparsed AST nodes in the method body.
+    """
+    def __init__(self, node: Optional[ast.FunctionDef] = None):
+        """
+        Initialize InitializerAnalyzer.
+
+        Parameters:
+        - node (Optional[ast.FunctionDef]): The AST node representing the initializer method.
+        """
         self.class_properties = []
         self.body = []
         super().__init__(node)
@@ -17,10 +31,25 @@ class InitializerAnalyzer(MethodAnalyzer):
                 self.body.append(ast.unparse(prop))
 
     def evaluate_assign_type(self, node: ast.Assign) -> str:
+        """
+        Evaluate the type of the assigned value in an assignment node.
+
+        Parameters:
+        - node (ast.Assign): The AST node representing an assignment.
+
+        Returns:
+        - str: The type of the assigned value.
+        """
         va = ValueAnalyzer(node.value)
         return va.type
 
     def search_properties(self, bodynode: ast.AST) -> None:
+        """
+        Search for class properties within the AST nodes of the method body.
+
+        Parameters:
+        - bodynode (ast.AST): The AST node to search for class properties.
+        """
         targets = []
         values: dict[str:list] = {}
         types: dict[str:list] = {}
@@ -66,6 +95,12 @@ class InitializerAnalyzer(MethodAnalyzer):
             self.search_properties(child)
 
     def visit_MethodDef(self, node: ast.FunctionDef) -> None:
+        """
+        Visit the MethodDef AST node to extract information about the method.
+
+        Parameters:
+        - node (ast.FunctionDef): The AST node representing the method.
+        """
         super().visit_MethodDef(node)
 
         for prop in node.body:
@@ -73,6 +108,12 @@ class InitializerAnalyzer(MethodAnalyzer):
             self.body.append(ast.unparse(prop))
     
     def data(self) -> dict:
+        """
+        Get the analyzed data of the initializer method.
+
+        Returns:
+        - Dict: The analyzed data of the initializer method.
+        """
         return {"name": self.name,
                 "arguments": self.arguments,
                 "properties": self.class_properties,

@@ -1,4 +1,5 @@
 import ast
+from typing import List
 
 
 importmap = {
@@ -47,7 +48,16 @@ importmap = {
 }
 
 
-def get_imports(filename: str):
+def get_imports(filename: str) -> List[str]:
+    """
+    Extract and convert import statements from a Python file.
+
+    Parameters:
+    - filename (str): The path to the Python file.
+
+    Returns:
+    - List[str]: List of converted import statements.
+    """
     with open(filename, 'r') as f:
         content = f.read()
     tree = ast.parse(content)

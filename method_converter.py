@@ -3,9 +3,20 @@ from argument_converter import ArgumentConverter
 from util import snake_to_camel
 from type_converter import TypeConverter
 from keyword_converter import convert_string_to_nim
+from typing import Optional
 
 
 class MethodConverter(object):
+    """
+    Converts Python method/function definitions to Nim syntax.
+
+    Attributes:
+    - variables (list[str]): List of variable names in the method.
+    - types (list[str]): List of variable types in the method.
+    - parent (str): The name of the parent class.
+    - node (Optional[ast.AST]): The AST node representing the method.
+    - string (str): Nim code representation of the method.
+    """
     def __init__(self) -> None:
         self.variables = []
         self.types = []
@@ -13,7 +24,17 @@ class MethodConverter(object):
         self.node = ast.AST
         self.string = "func  "
     
-    def convert_initializer_signature(self, method: ast.FunctionDef, parent: ast.ClassDef):
+    def convert_initializer_signature(self, method: ast.FunctionDef, parent: ast.ClassDef) -> str:
+        """
+        Convert the initializer method signature to Nim syntax.
+
+        Parameters:
+        - method (ast.FunctionDef): The AST node representing the initializer method.
+        - parent (ast.ClassDef): The AST node representing the parent class.
+
+        Returns:
+        - str: Nim syntax representation of the initializer method signature.
+        """
         self.string = "func "
         self.parent = parent.name
         self.node = method
@@ -37,7 +58,17 @@ class MethodConverter(object):
         
         return self.string
 
-    def convert_method_signature(self, method: ast.FunctionDef, parent_class: ast.ClassDef):
+    def convert_method_signature(self, method: ast.FunctionDef, parent_class: ast.ClassDef) -> str:
+        """
+        Convert the method signature to Nim syntax.
+
+        Parameters:
+        - method (ast.FunctionDef): The AST node representing the method.
+        - parent_class (ast.ClassDef): The AST node representing the parent class.
+
+        Returns:
+        - str: Nim syntax representation of the method signature.
+        """
         # def name(args:type=default) -> returns: ==> proc nameFunc(obj: var ClassName, args:type=default): returns =
         self.string = "func "
         self.parent = parent_class.name
@@ -70,15 +101,17 @@ class MethodConverter(object):
         
         return self.string
     
-    def convert_method_body(self, node: ast.FunctionDef, parent: ast.ClassDef):
-        
-        def count_indent(string):
-            co = 0
-            for char in string:
-                if char != " ":
-                    break
-                co+=1
-            return co
+    def convert_method_body(self, node: ast.FunctionDef, parent: ast.ClassDef) -> str:
+        """
+        Convert the method body to Nim syntax.
+
+        Parameters:
+        - node (ast.FunctionDef): The AST node representing the method.
+        - parent (ast.ClassDef): The AST node representing the parent class.
+
+        Returns:
+        - str: Nim syntax representation of the method body.
+        """
 
         nimstring = convert_string_to_nim(ast.unparse(node.body))
         splitlines = ["  " + x for x in nimstring.split("\n")]

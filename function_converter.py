@@ -19,13 +19,31 @@ from keyword_converter import convert_string_to_nim
 #        type_params: list[type_param]
 
 class FunctionConverter(object):
+    """
+    Converts Python function definitions to Nim syntax.
+
+    Attributes:
+    - names (List[str]): The list of function names.
+    - signatures (Dict[str, str]): Dictionary containing function signatures.
+    - bodies (Dict[str, str]): Dictionary containing function bodies.
+    - sources (Dict[str, str]): Dictionary containing the original source code of functions.
+    """
     def __init__(self) -> None:
         self.names = []
         self.signatures = {}
         self.bodies = {}
         self.sources = {}
     
-    def convert_function_signature(self, function_definition: ast.FunctionDef):
+    def convert_function_signature(self, function_definition: ast.FunctionDef) -> str:
+        """
+        Convert the function signature to Nim syntax.
+
+        Parameters:
+        - function_definition (ast.FunctionDef): The AST node representing the function.
+
+        Returns:
+        - str: Nim syntax representation of the function signature.
+        """
         string = "proc "
         string += snake_to_camel(function_definition.name) + "("
         arg_converter = ArgumentConverter()
@@ -41,18 +59,39 @@ class FunctionConverter(object):
         
         return string
     
-    def convert_function_body(self, function_definition: ast.FunctionDef):
+    def convert_function_body(self, function_definition: ast.FunctionDef) -> str:
+        """
+        Convert the function body to Nim syntax.
+
+        Parameters:
+        - function_definition (ast.FunctionDef): The AST node representing the function.
+
+        Returns:
+        - str: Nim syntax representation of the function body.
+        """
         nimstring = convert_string_to_nim(ast.unparse(function_definition.body))
         splitlines = ["  " + x for x in nimstring.split("\n")]
         return "\n".join(splitlines)
 
-    def add_function(self, function_definition: ast.FunctionDef):
+    def add_function(self, function_definition: ast.FunctionDef) -> None:
+        """
+        Add a function to the converter.
+
+        Parameters:
+        - function_definition (ast.FunctionDef): The AST node representing the function.
+        """
         name = snake_to_camel(function_definition.name)
         self.names.append(name)
         self.signatures[name] = self.convert_function_signature(function_definition)
         self.bodies[name] = self.convert_function_body(function_definition)
 
-    def assemble(self):
+    def assemble(self) -> str:
+        """
+        Assemble Nim code for all functions.
+
+        Returns:
+        - str: Nim code for all functions.
+        """
         return_string = "\n\n##########################################\n#  Functions  \n##########################################\n"
         for name in self.names:
             return_string += "\n"
@@ -60,7 +99,16 @@ class FunctionConverter(object):
             return_string += self.bodies[name] + "\n"
         return return_string
 
-def convert_all_functions(filepath: str):
+def convert_all_functions(filepath: str) -> FunctionConverter:
+    """
+    Convert information about all functions in a Python file to Nim code.
+
+    Parameters:
+    - filepath (str): The path to the Python file.
+
+    Returns:
+    - FunctionConverter: An instance of FunctionConverter containing information about the functions.
+    """
 
     with open(filepath, 'r') as f:
         content=f.read()
