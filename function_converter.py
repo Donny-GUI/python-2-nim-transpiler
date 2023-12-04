@@ -1,7 +1,7 @@
 import ast
 from argument_converter import ArgumentConverter
 from util import snake_to_camel
-from typer import TypeConverter
+from type_converter import TypeConverter
 from keyword_converter import convert_string_to_nim
 
 

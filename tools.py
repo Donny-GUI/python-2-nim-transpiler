@@ -33,7 +33,6 @@ WHITE_BG = '\033[47m'
 def color_green(text):
     return GREEN_BG + text + RESET
 
-
 def overprint(new_text):
     # Move the cursor up one line
     sys.stdout.write('\033[F')

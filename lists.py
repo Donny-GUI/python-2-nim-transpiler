@@ -1,8 +1,7 @@
-import re
-import os
-import ast 
+import ast
+from re import compile as regexCompile
+from re import DOTALL, MULTILINE
 from keyword import softkwlist
-import inspect
 
 
 AllPythonTypes = [
@@ -233,7 +232,6 @@ BuiltinTokens = [
     "__import__("
 ]
 
-# AST Arrays 
 NodeNames = ["Expression","Interactive","FunctionType","Constant","FormattedValue","JoinedStr","List","Tuple","Set","Dict","Name","Load","Store","Del","Starred","Expr","UnaryOp","UAdd","USub","Not","Invert","BinOp","Add","Sub","Mult","Div","FloorDiv","Mod","Pow","LShift","RShift","BitOr","BitXor","BitAnd","MatMult","BoolOp","And","Or","Compare","Eq","NotEq","Lt","LtE","Gt","GtE","Is","IsNot","In","NotIn","Call","keyword","IfExp","Attribute","NamedExpr","Subscript","Slice","ListComp","SetComp","GeneratorExp","DictComp","comprehension","Assign","AnnAssign","AugAssign","Raise","Assert","Delete","Pass","Import","ImportFrom","alias","If","For","While","Break","Continue","Try","TryStar","ExceptHandler","With","withitem","Match","match_case","MatchValue","MatchSingleton","MatchSequence","MatchStar","MatchMapping","MatchClass","MatchAs","MatchOr","FunctionDef","Lambda","arguments","arg","Return","Yield","YieldFrom","Global","Nonlocal","ClassDef","AsyncFunctionDef","Await","AsyncFor","AsyncWith"]
 NodeTypes = [ast.Expression, ast.Interactive, ast.FunctionType, ast.Constant, ast.FormattedValue, ast.JoinedStr, ast.List, ast.Tuple, ast.Set, ast.Dict, ast.Name, ast.Load, ast.Store, ast.Del, ast.Starred, ast.Expr, ast.UnaryOp, ast.UAdd, ast.USub, ast.Not, ast.Invert, ast.BinOp, ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow, ast.LShift, ast.RShift, ast.BitOr, ast.BitXor, ast.BitAnd, ast.MatMult, ast.BoolOp, ast.And, ast.Or, ast.Compare, ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE, ast.Is, ast.IsNot, ast.In, ast.NotIn, ast.Call, ast.keyword, ast.IfExp, ast.Attribute, ast.NamedExpr, ast.Subscript, ast.Slice, ast.ListComp, ast.SetComp, ast.GeneratorExp, ast.DictComp, ast.comprehension, ast.Assign, ast.AnnAssign, ast.AugAssign, ast.Raise, ast.Assert, ast.Delete, ast.Pass, ast.Import, ast.ImportFrom, ast.alias, ast.If, ast.For, ast.While, ast.Break, ast.Continue, ast.Try, ast.TryStar, ast.ExceptHandler, ast.With, ast.withitem, ast.Match, ast.match_case, ast.MatchValue, ast.MatchSingleton, ast.MatchSequence, ast.MatchStar, ast.MatchMapping, ast.MatchClass, ast.MatchAs, ast.MatchOr, ast.FunctionDef, ast.Lambda, ast.arguments, ast.arg, ast.Return, ast.Yield, ast.YieldFrom, ast.Global, ast.Nonlocal, ast.ClassDef, ast.AsyncFunctionDef, ast.Await, ast.AsyncFor, ast.AsyncWith]
 NodeVector = [i for i in range(0, len(NodeTypes))]
@@ -245,14 +243,14 @@ DataTypeTokens = [
 ]
 
 # REGEX
-FStringPattern = re.compile(r'f(["\']{1,3}).*?\1', re.DOTALL)
-VariableDefinitonPattern = re.compile(r'\b\w+\s*=\s*.+')
-KeywordPattern = re.compile(r'\b(?:' + '|'.join(KeywordTokens) + r')\b')
-SoftKeyWordPattern = re.compile(r'\b(?:' + '|'.join(softkwlist) + r')\b')
-FunctionDefinitionPattern = re.compile(r'\bdef\s+([a-zA-Z_]\w*)\s*\(')
-DunderMainPattern = re.compile(r'^\s*if\s+__name__\s*==\s*["\']__main__["\']\s*:$', re.MULTILINE)
-ClassPattern = re.compile(r'class\s+([a-zA-Z_]\w*)\s*:\s*(?:\n\s*def\s+([a-zA-Z_]\w*)\s*\([^)]*\):)?', re.MULTILINE)
-FunctionPattern = re.compile(r'def\s+([a-zA-Z_]\w*)\s*\([^)]*\):(?:.*?)(?:(?=\bdef\b)|$)', re.DOTALL | re.MULTILINE)
+FStringPattern = regexCompile(r'f(["\']{1,3}).*?\1', DOTALL)
+VariableDefinitonPattern = regexCompile(r'\b\w+\s*=\s*.+')
+KeywordPattern = regexCompile(r'\b(?:' + '|'.join(KeywordTokens) + r')\b')
+SoftKeyWordPattern = regexCompile(r'\b(?:' + '|'.join(softkwlist) + r')\b')
+FunctionDefinitionPattern = regexCompile(r'\bdef\s+([a-zA-Z_]\w*)\s*\(')
+DunderMainPattern = regexCompile(r'^\s*if\s+__name__\s*==\s*["\']__main__["\']\s*:$', MULTILINE)
+ClassPattern = regexCompile(r'class\s+([a-zA-Z_]\w*)\s*:\s*(?:\n\s*def\s+([a-zA-Z_]\w*)\s*\([^)]*\):)?', MULTILINE)
+FunctionPattern = regexCompile(r'def\s+([a-zA-Z_]\w*)\s*\([^)]*\):(?:.*?)(?:(?=\bdef\b)|$)', DOTALL | MULTILINE)
 all_patterns = [
     VariableDefinitonPattern,
     KeywordPattern,
@@ -262,27 +260,3 @@ all_patterns = [
     ClassPattern,
     FunctionPattern,
 ]
-
-def get_module_filepath(module_name):
-    try:
-        module = __import__(module_name)
-        filepath = getattr(module, "__file__", None)
-
-        if filepath:
-            # Convert to absolute path
-            filepath = os.path.abspath(filepath)
-            return filepath
-        else:
-            return f"Module '{module_name}' is not associated with a file."
-    except ImportError as e:
-        return f"Error: {e}"
-
-
-def get_module_source(module_name):
-    try:
-        module = __import__(module_name)
-        source_code = inspect.getsource(module)
-        return source_code
-    except ImportError as e:
-        return f"Error: {e}"
-

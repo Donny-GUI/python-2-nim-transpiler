@@ -1,8 +1,25 @@
 import ast 
 import re 
 from string import ascii_letters, digits
+import os
+
 
 WordCharacters = ascii_letters + digits
+
+
+def get_module_filepath(module_name: str):
+    try:
+        module = __import__(module_name)
+        filepath = getattr(module, "__file__", None)
+
+        if filepath:
+            # Convert to absolute path
+            filepath = os.path.abspath(filepath)
+            return filepath
+        else:
+            return f"Module '{module_name}' is not associated with a file."
+    except ImportError as e:
+        return f"Error: {e}"
 
 def python_hint_to_nim(python_hint: str):
     if python_hint == 'int':
@@ -119,36 +136,6 @@ def find_substring_end(original_string, substring):
         return end_index
     else:
         return -1
-    
-def get_param_info(node: ast.FunctionDef):
-    params = []
-    defaults = [ast.unparse(node) for node in node.args.defaults]
-    defaults_length = len(defaults)
-    argslength = len(node.args.args)
-    diff = argslength - defaults_length
-    using_defaults = []
-    for i in range(0, diff):
-        using_defaults.append("$NONE")
-    
-    for item in defaults:
-        using_defaults.append(item)
-    
-    rd = iter(using_defaults)
-    
-    for param in node.args.args:
-
-        deef = next(rd)
-        if deef == "$NONE":deef = None
-        param_info = {'name': param.arg, 'type': None, 'default': deef}
-
-        if param.annotation:
-            # Get the type hint using ast.unparse
-            param_info['type'] = ast.unparse(param.annotation)
-
-        params.append(param_info)
-    
-    return params
-
 
 def extract_list_items(input_string):
     try:
@@ -248,6 +235,31 @@ def get_python_nodes(filename: str) -> list[ast.AST]:
     
     tree = ast.parse(source=source, type_comments=True, feature_version=(3, 12), mode="exec")
     return [node for node in ast.walk(tree)]
+
+
+def python_hint_to_nim(python_hint):
+    if python_hint == 'int':
+        return "int"
+    elif python_hint == 'str':
+        return "string"
+    elif python_hint == 'float':
+        return "float"
+    elif python_hint == 'bool':
+        return "bool"
+    elif python_hint == None:
+        return "nil"
+    elif python_hint.startswith('List[') and python_hint.endswith(']'):
+        inner_type = python_hint[5:-1]
+        nim_inner_type = python_hint_to_nim(inner_type)
+        return f"seq[{nim_inner_type}]"
+    elif python_hint.startswith('Dict[') and python_hint.endswith(']'):
+        inner_types = python_hint[5:-1].split(', ')
+        nim_key_type = python_hint_to_nim(inner_types[0])
+        nim_value_type = python_hint_to_nim(inner_types[1])
+        return f"Table[{nim_key_type}, {nim_value_type}]"
+    else:
+        # For other cases, return as is (may need to handle more cases)
+        return python_hint
 
 
 token_mapping = {

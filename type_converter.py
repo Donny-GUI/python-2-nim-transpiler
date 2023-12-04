@@ -1,6 +1,5 @@
 import ast
 from typing import Type, Union, Optional
-import re
 
 
 class TypeConverter:
@@ -128,4 +127,3 @@ def get_python_type(node: ast.AST) -> Optional[Type[Union[int, float, str, bool,
         return set
     else:
         return None
-

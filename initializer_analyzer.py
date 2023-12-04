@@ -3,7 +3,6 @@ from method_analyzer import MethodAnalyzer
 from value_analyzer import ValueAnalyzer
 
 
-
 class InitializerAnalyzer(MethodAnalyzer):
     def __init__(self, node: ast.FunctionDef=None):
         self.class_properties = []

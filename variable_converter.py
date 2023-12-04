@@ -1,5 +1,4 @@
 import ast
-import tokenize
 
 
 class VariableInfo(object):

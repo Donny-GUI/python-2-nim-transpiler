@@ -1,4 +1,4 @@
-from class_converter import ClassConverter, convert_all_classes
+from class_converter import convert_all_classes
 import os
 import sys
 

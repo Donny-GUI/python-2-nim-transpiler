@@ -1,7 +1,6 @@
 import ast
 
 
-
 class MethodAnalyzer(ast.NodeVisitor):
     def __init__(self, node: ast.FunctionDef=None):
         super().__init__()

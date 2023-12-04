@@ -6,7 +6,16 @@ from class_converter import ClassConverter, convert_all_classes
 from import_fixer import get_imports
 
 
-def convert_python_source_to_nim_source(filepath: str, outfile:str=None):
+def convert_python_source_to_nim_source(filepath: str, outfile:str=None) -> None:
+    """
+    Convert a python source file to a nim source file by path string
+
+    Arguments:
+        filepath (str): path to the file to convert
+        outfile (str): path to the optional output file to write too.
+    Returns: None
+    """
+
     print("[py2nim]: Converting python source ", filepath)
     start_string = """\
 import std/strutils
@@ -47,8 +56,6 @@ import tables
     print("[py2nim]: saving ", newfile)
     with open(newfile, "w") as wfile:
         wfile.write(start_string)
-
-
 
 
 def main():

@@ -128,20 +128,13 @@ token_mapping = {
             '"[-':'"[^',
             ".dedent(": ".unindent(",
             "bool(": "parseBool(",
-            
-
-
 }
-
-
-
 
 def convert_string_to_nim(string: str):
     new_string = string
     for name, value in token_mapping.items():
         new_string = new_string.replace(name, value)
     return new_string
-
 
 class KeywordConverter:
 
@@ -151,6 +144,3 @@ class KeywordConverter:
             return token_mapping[string]
         except NameError:
             return string
-        
-
-

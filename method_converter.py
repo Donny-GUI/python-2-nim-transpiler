@@ -1,8 +1,7 @@
 import ast 
 from argument_converter import ArgumentConverter
-from util import snake_to_camel, convert_assign_to_nim
-from assign_converter import AssignConverter
-from typer import TypeConverter
+from util import snake_to_camel
+from type_converter import TypeConverter
 from keyword_converter import convert_string_to_nim
 
 
@@ -85,32 +84,3 @@ class MethodConverter(object):
         splitlines = ["  " + x for x in nimstring.split("\n")]
         return "\n".join(splitlines)
 
-
-def adjust_indentation(lines):
-    result = []
-    current_indent = 0
-    last_indentation = -1
-    indentation = 0
-    for line in lines:
-        stripped_line = line.lstrip()
-        last_indentation = indentation
-        indentation = len(line) - len(stripped_line)
-
-        if last_indentation < indentation:
-            current_indent = indentation
-        
-
-        if stripped_line.startswith(("for ", "while ", "if ", "else ", "elif ", "try ", "except ", "finally ", "with ")):
-            result.append(" " * current_indent + stripped_line)
-            current_indent += 4  # Assuming 4 spaces per level of indentation
-        elif stripped_line.startswith(("continue", "break", "return", "pass")):
-            result.append(" " * current_indent + stripped_line)
-            current_indent -= 4
-            current_indent = abs(current_indent)
-        elif current_indent > 0:
-            result.append(" " * current_indent + stripped_line)
-        else:
-            result.append(line)
-
-    return result
- 

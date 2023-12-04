@@ -35,10 +35,6 @@ class AssignConverter2:
         return f'{target} {nim_operator} {value}'
 
 
-
-
-
-
 class AssignConverter:
     def __init__(self):
         self.assign_node = None
