@@ -4,6 +4,23 @@
 ![Screenshot 2023-12-03 174056](https://github.com/Donny-GUI/python-2-nim-transpiler/assets/108424001/ef2109c7-54af-4526-943e-bf37558ee8eb)
 
 
+# Current Progress
+Within the python_module_maps.py file i am trying to map all the standard library modules to the nim equivalent (if possible).
+
+if not possible:
+   
+   >create a template, type, macro or type ref by RootObj equivalent that can substitute in.
+    
+
+This will allow ```Complete Transpile``` of any python code within the standard library to nim. 
+
+For non-standard library imports i am going to simply transpile them as needed. 
+
+Hopefully this will make the transpilier completely operable with python moving forward and backwards.
+
+#### This is going to take a long time.
+I could really use some help.
+
 # Getting Started ✨
 
 
