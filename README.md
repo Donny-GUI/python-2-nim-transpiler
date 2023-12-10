@@ -109,5 +109,15 @@ The follow is  a description of the workflow for transpiling the python source t
 
    5.4 Fix Open with(filename, filemode) as fileReference blocks
 
+6. Begin Import and Dependency conversion
+
+   6.1 Get all standard lib imports
+
+   6.2 Get all standard library import objects used by reference
+
+   6.3 Get all standard library import FROM objects
+
+   6.4 Use the python_module_maps.py file to substitute the nim equivalents i have set up.
+
 7. Write source
    
