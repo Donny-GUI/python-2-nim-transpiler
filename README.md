@@ -31,6 +31,24 @@ python3 app.py [yourFile.py]
 This project is still in its testing phase. It is not for production use yet.
 
 
+# TODO 
+1. collections.namedtuple
+2. list comprehensions
+3. single-line print comprehensions
+4. dictionary comprehensions
+5. set comprehensions
+6. Ternary operators
+7. changing file permissions
+8. map and filter builtins
+9. Decorators
+10. json small one offs
+11. Self execution and main modules
+12. unitest module
+13. Docstring conversions
+14. Optional indentation
+15. async procs
+16. Perhaps, make with open template?
+
 # Transpile Workflow
 The follow is  a description of the workflow for transpiling the python source to nim source 
 
