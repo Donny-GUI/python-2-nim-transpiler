@@ -1,13 +1,16 @@
 import re
 
 
-WithOpenMandatoryTemplate = """template withOpen(name: string, mode: char, body: untyped) =
+WithOpenMandatoryTemplate = """
+template withOpen(name: string, mode: char, body: untyped) =
   let flag = if mode == 'w': fmWrite else: fmRead  # "flag" doen't exist outside of this template
   let file {.inject.} = open(name, flag)   # Create and inject `file` variable, `file` exists outside of this template because of {.inject.}
   try:
     body                                   # `body` is the code passed as argument
   finally:
-    file.close()                           # Code after the code passed as argument\n"""
+    file.close()                           # Code after the code passed as argument
+
+"""
 
 
 
@@ -50,19 +53,19 @@ def extract_first_quoted_string(input_string: str):
     match = re.search(r'"([^"]*)"', input_string)
     return match.group(1) if match else None
 
-def replace_read(input_string, filename: str):
+def replace_read(input_string: str, filename: str):
     pattern = re.compile(r'(\w+)\s*=\s*(\w+)\.read\(\)')
     replacement = r'\1 = read_file('
     result = re.sub(pattern, replacement, input_string)
     return result.strip("\n") + filename + ")\n"
 
-def replace_readlines(input_string, filename: str):
+def replace_readlines(input_string: str, filename: str):
     pattern = re.compile(r'(\w+)\s*=\s*(\w+)\.readlines\(\)')
     replacement = r'\1 = readLines('
     result = re.sub(pattern, replacement, input_string)
     return result.strip("\n") + filename + ")\n"
 
-def replace_writelines(input_string, filename: str):
+def replace_writelines(input_string: str, filename: str):
     # FIXME
     pattern = re.compile(r'(\w+)\s*=\s*(\w+)\.writelines\(\)')
     replacement = r'\1 = writeLines(\2, \3)'
@@ -70,7 +73,7 @@ def replace_writelines(input_string, filename: str):
     result = re.sub(pattern, replacement, input_string)
     return result
 
-def replace_write(input_string, filename: str):
+def replace_write(input_string: str, filename: str):
     # FIXME 
     pattern = re.compile(r'(\w+)\s*=\s*(\w+)\.write\(\)')
     replacement = r'\1 = write_file('

@@ -24,9 +24,7 @@ def convert_python_source_to_nim_source(filepath: str, outfile:str=None) -> None
     start_string = """\
 import std/strutils
 import tables
-import option
-
-    \n"""
+import option\n"""
     print("[py2nim]: Getting imports...")
     import_strings = get_imports(filepath)
     if len(import_strings) != 0:
