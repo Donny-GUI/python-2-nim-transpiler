@@ -12,7 +12,7 @@ import option
 
 proc getImports(filename: Option[string] = none[string]): seq[string] = 
   "\n  Extract and convert import statements from a Python file.\n\n  Parameters:\n  - filename (str): The path to the Python file.\n\n  Returns:\n  - List[string]: List of converted import statements.\n  "
-  content = read_file(f)
+  content = read_file(filename)
   tree = ast.parse(content)
   var strings: seq = @[]
   for node in ast.walk(tree):
