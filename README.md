@@ -64,5 +64,15 @@ The follow is  a description of the workflow for transpiling the python source t
 
    4.2. make all the function bodies
 
-5. Write source
+5. Start fixing phase
+
+   5.1 Fix variable assignments for strings, ints, sequences
+
+   5.2 Fix Double quote glitch
+
+   5.3 Fix proc type hints
+
+   5.4 Fix Open with(filename, filemode) as fileReference blocks
+
+7. Write source
    
