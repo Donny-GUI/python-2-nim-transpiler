@@ -7,6 +7,15 @@ import shutil
 
 WordCharacters = ascii_letters + digits
 
+def count_spaces_until_first_letter(input_string):
+    space_count = 0
+    for char in input_string:
+        if char.isspace():
+            space_count += 1
+        else:
+            break  # Exit loop when the first non-space character is encountered
+    return space_count
+
 def replicate_directory_structure(source_dir='.', target_dir='project_nim'):
     # Get the absolute paths of source and target directories
     source_dir = os.path.abspath(source_dir)

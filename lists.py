@@ -3,6 +3,37 @@ from re import compile as regexCompile
 from re import DOTALL, MULTILINE
 from keyword import softkwlist
 
+python_basic_types = [
+    "int", "float", "str", "list", "tuple", "dict", "set", "bool",
+    "bytes", "bytearray", "complex", "range", "NoneType", "type",
+]
+
+
+python_types = [
+    "int", "float", "str", "list", "tuple", "dict", "set", "bool",
+    "bytes", "bytearray", "complex", "range", "NoneType", "type",
+    "function", "module", "classobj", "method", "builtin_function_or_method",
+    "instance", "ellipsis", "NotImplementedType", "memoryview", "slice",
+    "frozenset", "property", "super", "file", "buffer", "long", "unicode",
+    "basestring", "xrange", "byteview", "code", "frame", "traceback",
+    "getset_descriptor", "member_descriptor", "wrapper_descriptor",
+    "dictproxy", "generator", "coroutine", "coroutine_wrapper",
+    "async_generator", "async_generator_wrapper", "cell", "method-wrapper",
+    "dynamic_class_instance", "type", "function", "builtin_function_or_method",
+    "generator", "iterator", "callable_iterator", "coroutine", "method",
+    "async_generator", "contextmanager", "getset_descriptor", "member_descriptor",
+    "wrapper_descriptor", "method-wrapper", "CodeType", "FrameType",
+    "TracebackType", "ModuleType", "function", "LambdaType", "GeneratorType",
+    "CoroutineType", "CodeType", "TypeType", "ClassType", "InstanceType",
+    "MethodType", "UnboundMethodType", "BuiltinFunctionType", "BuiltinMethodType",
+    "ModuleType", "FileType", "XRangeType", "SliceType", "EllipsisType",
+    "MemoryViewType", "SetType", "FrozensetType", "PropertyType", "SuperType",
+    "DictProxyType", "CellType", "MethodWrapperType", "WrapperDescriptorType",
+    "FunctionType", "MethodType", "GeneratorWrapperType", "CoroutineWrapperType",
+    "AsyncGeneratorWrapperType", "MapType", "UnicodeType", "LongType", "BufferType",
+    "ObjectType", "IntType", "DictType", "ListType", "TupleType", "StringType",
+    "UnicodeType", "FloatType", "ComplexType", "LongType", "BufferType", "NoneType"
+]
 
 AllPythonTypes = [
     # Super-special typing primitives.
