@@ -7,7 +7,9 @@ from class_converter import ClassConverter, convert_all_classes
 from import_fixer import get_imports
 from postprocessing import var_assignment_for_integers, var_assignment_for_sequences, var_assignment_for_strings, fix_weird_double_quote
 from signature_type_converter import fix_proc_types
-from with_open_fixer import fix_nim_open_with 
+from with_open_fixer import fix_nim_open_with
+
+from modules.os import fix_os_modules
 
 
 def convert_python_source_to_nim_source(filepath: str, outfile:str=None) -> None:
@@ -72,6 +74,8 @@ import option\n"""
     fix_proc_types(newfile)
     print("[py2nim]: Fixing open with context managers")
     fix_nim_open_with(newfile)
+    print("[py2nim]: Fixing os module...")
+    fix_os_modules(newfile)
     print("[py2nim]: Done!")
 
 def convert_python_project():
