@@ -6,8 +6,8 @@ MandatoryStringImports = [
     "let asciiLetters: string = cstring.asciiLowercase & cstring.asciiUppercase",
     "let hexDigits: string = cstring.digits & cstring.asciiLowercase[10..15] & cstring.asciiUppercase[10..15]",
     "let octDigits: string = cstring.digits[0..7]",
-    """let punctuation: string = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"""",
-    'let whitespace: string = " \t\n\r\x0B\x0C"',
+    r"""let punctuation: string = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~""",
+    r'''let whitespace: string = " \t\n\r\x0B\x0C"''',
 ]
 
 PythonStringConstants = {

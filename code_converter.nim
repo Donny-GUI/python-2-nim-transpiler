@@ -1,7 +1,6 @@
 import std/strutils
 import tables
-
-    
+import option
 
 
 
@@ -9,13 +8,13 @@ import tables
 #  Functions  
 ##########################################
 
-proc name(anyclass: any = nil): string = 
+proc name(anyclass: Option[any] = none[any]): string = 
   return anyclass.__name__
 
-proc attributes(anyclass: any = nil): seq[string] = 
+proc attributes(anyclass: Option[any] = none[any]): seq[string] = 
   return [attr for attr in vars(anyclass) if not callable(getattr(anyclass, attr)) and (not attr.startsWith("__"))]
 
-proc properties(anyclass: any = nil): seq[string] = 
+proc properties(anyclass: Option[any] = none[any]): seq[string] = 
   proc make_instance(anyclass, args=0):
     if args != 0:
       values = nil * args
@@ -36,7 +35,7 @@ proc properties(anyclass: any = nil): seq[string] =
   all_attributes = dir(my_instance)
   return [attr for attr in all_attributes if not callable(getattr(my_instance, attr)) and (not attr.startsWith("__"))]
 
-proc makeInstance(anyclass: nil = nil, args: nil = 0): nil = 
+proc makeInstance(anyclass: Option[nil] = none[nil], args: nil = 0): nil = 
   if args != 0:
     values = nil * args
     try:
@@ -53,14 +52,14 @@ proc makeInstance(anyclass: nil = nil, args: nil = 0): nil =
     finally:
       return instance
 
-proc convertSubscriptToNim(node: nil = nil): nil = 
+proc convertSubscriptToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Subscript):
     raise ValueError("Input must be an ast.Subscript node")
   value = convert_expr_to_nim(node.value)
   slice_expr = convert_slice_to_nim(node.slice)
   return fmt"{value}[{slice_expr}]"
 
-proc convertSliceToNim(slice_node: nil = nil): nil = 
+proc convertSliceToNim(slice_node: Option[nil] = none[nil]): nil = 
   if isinstance(slice_node, ast.Index):
     return convert_expr_to_nim(slice_node.value)
   elif isinstance(slice_node, ast.Slice):
@@ -71,10 +70,10 @@ proc convertSliceToNim(slice_node: nil = nil): nil =
   else:
     discard
 
-proc convertKeywordToNim(keyword: nil = nil): nil = 
+proc convertKeywordToNim(keyword: Option[nil] = none[nil]): nil = 
   return fmt"{keyword.arg} = {convert_expr_to_nim(keyword.value)}"
 
-proc convertCmpopToNim(cmpop_node: nil = nil): nil = 
+proc convertCmpopToNim(cmpop_node: Option[nil] = none[nil]): nil = 
   if isinstance(cmpop_node, ast.Eq):
     return "=="
   elif isinstance(cmpop_node, ast.NotEq):
@@ -90,26 +89,26 @@ proc convertCmpopToNim(cmpop_node: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported comparison operator node: {type(cmpop_node).__name__}")
 
-proc convertSetcompToNim(node: nil = nil): nil = 
+proc convertSetcompToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.SetComp):
     raise ValueError("Input must be an ast.SetComp node")
   target = convert_expr_to_nim(node.elt)
   generators = [convert_comprehension_to_nim(generator) for generator in node.generators]
   return fmt"{{ {target} {generators} }}"
 
-proc convertComprehensionToNim(generator: nil = nil): nil = 
+proc convertComprehensionToNim(generator: Option[nil] = none[nil]): nil = 
   target = convert_expr_to_nim(generator.target)
   iter_expr = convert_expr_to_nim(generator.iter)
   ifs = [fmt"if {convert_expr_to_nim(iff)}" for iff in generator.ifs]
   return fmt"for {target} in {iter_expr} {ifs}"
 
-proc convertJoinedstrToNim(node: nil = nil): nil = 
+proc convertJoinedstrToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.JoinedStr):
     raise ValueError("Input must be an ast.JoinedStr node")
   parts = [convert_expr_to_nim(value) if isinstance(value, ast.FormattedValue) else string(value.s) for value in node.values]
   return fmt""{"".join(parts)}""
 
-proc convertFormattedvalueToNim(node: nil = nil): nil = 
+proc convertFormattedvalueToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.FormattedValue):
     raise ValueError("Input must be an ast.FormattedValue node")
   value = convert_expr_to_nim(node.value)
@@ -120,40 +119,40 @@ proc convertFormattedvalueToNim(node: nil = nil): nil =
   else:
     return fmt""{value}""
 
-proc convertNamedexprToNim(node: nil = nil): nil = 
+proc convertNamedexprToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.NamedExpr):
     raise ValueError("Input must be an ast.NamedExpr node")
   target = convert_expr_to_nim(node.target)
   value = convert_expr_to_nim(node.value)
   return fmt"{target} = {value}"
 
-proc convertAttributeToNim(node: nil = nil): nil = 
+proc convertAttributeToNim(node: Option[nil] = none[nil]): nil = 
   attribute_name = convert_expr_to_nim(node.value)
   attribute_value = convert_expr_to_nim(node.value)
   nim_attribute = fmt"{attribute_name} = {attribute_value}"
   return nim_attribute
 
-proc convertStarredToNim(node: nil = nil): nil = 
+proc convertStarredToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Starred):
     raise ValueError("Input must be an ast.Starred node")
   value = convert_expr_to_nim(node.value)
   return fmt"@{value}"
 
-proc convertListToNim(node: nil = nil): nil = 
+proc convertListToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.List):
     raise ValueError("Input must be an ast.List node")
   elements = [convert_expr_to_nim(elem) for elem in node.elts]
   nim_@[] = fmt"seq[{", ".join(elements)}]"
   return nim_@[]
 
-proc convertTupleToNim(node: nil = nil): nil = 
+proc convertTupleToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Tuple):
     raise ValueError("Input must be an ast.Tuple node")
   elements = [convert_expr_to_nim(elem) for elem in node.elts]
   nim_tuple = fmt"({", ".join(elements)})"
   return nim_tuple
 
-proc convertAsyncfunctiondefToNim(node: nil = nil): nil = 
+proc convertAsyncfunctiondefToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.AsyncFunctionDef):
     raise ValueError("Input must be an ast.AsyncFunctionDef node")
   function_name = node.name
@@ -168,7 +167,7 @@ proc convertAsyncfunctiondefToNim(node: nil = nil): nil =
   nim_async_function += body
   return nim_async_function
 
-proc convertClassdefToNim(node: nil = nil): nil = 
+proc convertClassdefToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.ClassDef):
     raise ValueError("Input must be an ast.ClassDef node")
   class_name = node.name
@@ -179,10 +178,10 @@ proc convertClassdefToNim(node: nil = nil): nil =
   nim_class += class_body
   return nim_class
 
-proc convertClassbodyToNim(body_nodes: nil = nil): nil = 
+proc convertClassbodyToNim(body_nodes: Option[nil] = none[nil]): nil = 
   return "\n".join([convert_classstmt_to_nim(stmt) for stmt in body_nodes])
 
-proc convertClassstmtToNim(stmt_node: nil = nil): nil = 
+proc convertClassstmtToNim(stmt_node: Option[nil] = none[nil]): nil = 
   if isinstance(stmt_node, ast.FunctionDef):
     return convert_method_to_nim(stmt_node)
   elif isinstance(stmt_node, ast.AsyncFunctionDef):
@@ -192,7 +191,7 @@ proc convertClassstmtToNim(stmt_node: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported class statement node: {type(stmt_node).__name__}")
 
-proc convertMethodToNim(node: nil = nil, is_async: nil = false): nil = 
+proc convertMethodToNim(node: Option[nil] = none[nil], is_async: nil = false): nil = 
   method_name = node.name
   parameters = [convert_arg_to_nim(arg) for arg in node.args.args]
   var parameters_str: string = ", ".join(parameters)
@@ -205,13 +204,13 @@ proc convertMethodToNim(node: nil = nil, is_async: nil = false): nil =
   nim_method += body
   return nim_method
 
-proc convertAttributeToNim(node: nil = nil): nil = 
+proc convertAttributeToNim(node: Option[nil] = none[nil]): nil = 
   attribute_name = convert_expr_to_nim(node.value)
   attribute_value = convert_expr_to_nim(node.value)
   nim_attribute = fmt"{attribute_name} = {attribute_value}"
   return nim_attribute
 
-proc convertFunctiondefToNim(node: nil = nil): nil = 
+proc convertFunctiondefToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.FunctionDef):
     raise ValueError("Input must be an ast.FunctionDef node")
   function_name = node.name
@@ -225,16 +224,16 @@ proc convertFunctiondefToNim(node: nil = nil): nil =
   nim_function += body
   return nim_function
 
-proc convertArgToNim(arg_node: nil = nil): nil = 
+proc convertArgToNim(arg_node: Option[nil] = none[nil]): nil = 
   if isinstance(arg_node, ast.arg):
     return arg_node.arg
   else:
     raise ValueError("Unsupported argument node")
 
-proc convertBodyToNim(body_nodes: nil = nil): nil = 
+proc convertBodyToNim(body_nodes: Option[nil] = none[nil]): nil = 
   return "\n".join([convert_stmt_to_nim(stmt) for stmt in body_nodes])
 
-proc convertAsyncforToNim(node: nil = nil): nil = 
+proc convertAsyncforToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.AsyncFor):
     raise ValueError("Input must be an ast.AsyncFor node")
   target = convert_expr_to_nim(node.target)
@@ -244,7 +243,7 @@ proc convertAsyncforToNim(node: nil = nil): nil =
   nim_asyncfor_loop += body
   return nim_asyncfor_loop
 
-proc convertStmtToNim(stmt_node: nil = nil): nil = 
+proc convertStmtToNim(stmt_node: Option[nil] = none[nil]): nil = 
   if isinstance(stmt_node, ast.Expr):
     return convert_expr_to_nim(stmt_node.value)
   elif isinstance(stmt_node, ast.Return):
@@ -263,7 +262,7 @@ proc convertStmtToNim(stmt_node: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported statement node: {type(stmt_node).__name__}")
 
-proc convertAssignToNim(node: nil = nil): nil = 
+proc convertAssignToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Assign):
     raise ValueError("Input must be an ast.Assign node")
   if isinstance(node.value, ast.Constant):
@@ -291,7 +290,7 @@ proc convertAssignToNim(node: nil = nil): nil =
     nim_assignments.add(nim_assignment)
   return "\n".join(nim_assignments)
 
-proc convertAugassignToNim(node: nil = nil): nil = 
+proc convertAugassignToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.AugAssign):
     raise ValueError("Input must be an ast.AugAssign node")
   target = convert_expr_to_nim(node.target)
@@ -300,7 +299,7 @@ proc convertAugassignToNim(node: nil = nil): nil =
   nim_assignment = fmt"{target} {op}= {value}"
   return nim_assignment
 
-proc convertAnnassignToNim(node: nil = nil): nil = 
+proc convertAnnassignToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.AnnAssign):
     raise ValueError("Input must be an ast.AnnAssign node")
   target = convert_expr_to_nim(node.target)
@@ -309,7 +308,7 @@ proc convertAnnassignToNim(node: nil = nil): nil =
   nim_assignment = fmt"{target}: {annotation} = {value}"
   return nim_assignment
 
-proc convertForToNim(node: nil = nil): nil = 
+proc convertForToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.For):
     raise ValueError("Input must be an ast.For node")
   target = convert_expr_to_nim(node.target)
@@ -319,7 +318,7 @@ proc convertForToNim(node: nil = nil): nil =
   nim_for_loop += body
   return nim_for_loop
 
-proc convertWhileToNim(node: nil = nil): nil = 
+proc convertWhileToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.While):
     raise ValueError("Input must be an ast.While node")
   test = convert_expr_to_nim(node.test)
@@ -328,13 +327,13 @@ proc convertWhileToNim(node: nil = nil): nil =
   nim_while_loop += body
   return nim_while_loop
 
-proc convertCompareToNim(compare_node: nil = nil): nil = 
+proc convertCompareToNim(compare_node: Option[nil] = none[nil]): nil = 
   left = convert_expr_to_nim(compare_node.left)
   right = convert_expr_to_nim(compare_node.comparators[0])
   op = convert_cmpop_to_nim(compare_node.ops[0])
   return fmt"({left} {op} {right})"
 
-proc convertCmpopToNim(cmpop_node: nil = nil): nil = 
+proc convertCmpopToNim(cmpop_node: Option[nil] = none[nil]): nil = 
   if isinstance(cmpop_node, ast.Eq):
     return "=="
   elif isinstance(cmpop_node, ast.NotEq):
@@ -350,7 +349,7 @@ proc convertCmpopToNim(cmpop_node: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported comparison operator node: {type(cmpop_node).__name__}")
 
-proc convertIfToNim(node: nil = nil): nil = 
+proc convertIfToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.If):
     raise ValueError("Input must be an ast.If node")
   test = convert_expr_to_nim(node.test)
@@ -362,7 +361,7 @@ proc convertIfToNim(node: nil = nil): nil =
     nim_if_statement += orelse
   return nim_if_statement
 
-proc convertOrelseToNim(orelse_nodes: nil = nil): nil = 
+proc convertOrelseToNim(orelse_nodes: Option[nil] = none[nil]): nil = 
   if not orelse_nodes:
     return ""
   if isinstance(orelse_nodes[0], ast.If):
@@ -370,7 +369,7 @@ proc convertOrelseToNim(orelse_nodes: nil = nil): nil =
   else:
     return "else:\n" + convert_body_to_nim(orelse_nodes)
 
-proc convertWithToNim(node: nil = nil): nil = 
+proc convertWithToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.With):
     raise ValueError("Input must be an ast.With node")
   context_expr = convert_expr_to_nim(node.context_expr)
@@ -379,7 +378,7 @@ proc convertWithToNim(node: nil = nil): nil =
   nim_with_statement += body
   return nim_with_statement
 
-proc convertAsyncwithToNim(node: nil = nil): nil = 
+proc convertAsyncwithToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.AsyncWith):
     raise ValueError("Input must be an ast.AsyncWith node")
   context_expr = convert_expr_to_nim(node.context_expr)
@@ -388,7 +387,7 @@ proc convertAsyncwithToNim(node: nil = nil): nil =
   nim_asyncwith_statement += body
   return nim_asyncwith_statement
 
-proc convertRaiseToNim(node: nil = nil): nil = 
+proc convertRaiseToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Raise):
     raise ValueError("Input must be an ast.Raise node")
   if node.exc isnot nil:
@@ -401,7 +400,7 @@ proc convertRaiseToNim(node: nil = nil): nil =
     nim_raise_statement += fmt", {cause}"
   return nim_raise_statement
 
-proc convertTryToNim(node: nil = nil): nil = 
+proc convertTryToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Try):
     raise ValueError("Input must be an ast.Try node")
   body = convert_body_to_nim(node.body)
@@ -417,7 +416,7 @@ proc convertTryToNim(node: nil = nil): nil =
     nim_try_statement += fmt"\nfinally:\n{finalbody}"
   return nim_try_statement
 
-proc convertExceptsToNim(handlers: nil = nil): nil = 
+proc convertExceptsToNim(handlers: Option[nil] = none[nil]): nil = 
   if not handlers:
     return ""
   var nim_excepts: seq = @[]
@@ -428,7 +427,7 @@ proc convertExceptsToNim(handlers: nil = nil): nil =
     nim_excepts.add(nim_except)
   return "\n".join(nim_excepts)
 
-proc convertAssertToNim(node: nil = nil): nil = 
+proc convertAssertToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Assert):
     raise ValueError("Input must be an ast.Assert node")
   test = convert_expr_to_nim(node.test)
@@ -436,7 +435,7 @@ proc convertAssertToNim(node: nil = nil): nil =
   nim_assert_statement = fmt"assert {test}, {msg}"
   return nim_assert_statement
 
-proc convertImportToNim(node: nil = nil): nil = 
+proc convertImportToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Import):
     raise ValueError("Input must be an ast.Import node")
   var nim_import_statements: seq = @[]
@@ -445,13 +444,13 @@ proc convertImportToNim(node: nil = nil): nil =
     nim_import_statements.add(fmt"import {module_name}")
   return "\n".join(nim_import_statements)
 
-proc convertAliasToNim(alias: nil = nil): nil = 
+proc convertAliasToNim(alias: Option[nil] = none[nil]): nil = 
   if alias.asname isnot nil:
     return fmt"{alias.name} as {alias.asname}"
   else:
     return alias.name
 
-proc convertTargetToNim(node: nil = nil): nil = 
+proc convertTargetToNim(node: Option[nil] = none[nil]): nil = 
   if isinstance(node, ast.Name):
     return node.id
   elif isinstance(node, ast.Call):
@@ -459,7 +458,7 @@ proc convertTargetToNim(node: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported target node: {type(node).__name__}")
 
-proc convertAstNodeToNim(node: nil = nil): nil = 
+proc convertAstNodeToNim(node: Option[nil] = none[nil]): nil = 
   if isinstance(node, ast.BinOp):
     left = convert_ast_node_to_nim(node.left)
     right = convert_ast_node_to_nim(node.right)
@@ -476,7 +475,7 @@ proc convertAstNodeToNim(node: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported expression node: {type(node).__name__}")
 
-proc convertListcompToNim(node: nil = nil): nil = 
+proc convertListcompToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.ListComp):
     raise ValueError("Input must be an ast.ListComp node")
   target = node.elt
@@ -495,7 +494,7 @@ proc convertListcompToNim(node: nil = nil): nil =
   nim_code += ")\n"
   return nim_code
 
-proc convertImportfromToNim(node: nil = nil): nil = 
+proc convertImportfromToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.ImportFrom):
     raise ValueError("Input must be an ast.ImportFrom node")
   module_name = convert_module_to_nim(node)
@@ -503,33 +502,33 @@ proc convertImportfromToNim(node: nil = nil): nil =
   nim_importfrom_statement = fmt"from {module_name} import {imported_names}"
   return nim_importfrom_statement
 
-proc convertModuleToNim(node: nil = nil): nil = 
+proc convertModuleToNim(node: Option[nil] = none[nil]): nil = 
   module_name = node.module
   if node.level > 0:
     var module_name: string = "." * node.level + module_name
   return module_name
 
-proc convertImportedNamesToNim(names: nil = nil): nil = 
+proc convertImportedNamesToNim(names: Option[nil] = none[nil]): nil = 
   var nim_imported_names: seq = @[]
   for alias in names:
     nim_imported_names.add(convert_alias_to_nim(alias))
   return ", ".join(nim_imported_names)
 
-proc convertLambdaToNim(node: nil = nil): nil = 
+proc convertLambdaToNim(node: Option[nil] = none[nil]): nil = 
   var parameters: string = ", ".join((param.arg for param in node.args.args))
   nim_proc = fmt"proc ({parameters}): "
   body = convert_expr_to_nim(node.body)
   nim_proc += fmt"{body}"
   return nim_proc
 
-proc convertConstantToNim(node: nil = nil): nil = 
+proc convertConstantToNim(node: Option[nil] = none[nil]): nil = 
   if node.value == nil:
     return "nil"
   value = node.value
   nim_literal = convert_value_to_nim_literal(value)
   return nim_literal
 
-proc convertValueToNimLiteral(value: nil = nil): nil = 
+proc convertValueToNimLiteral(value: Option[nil] = none[nil]): nil = 
   lit = ast.unparse(value)
   if isinstance(value, str):
     return fmt""{value}""
@@ -548,7 +547,7 @@ proc convertValueToNimLiteral(value: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported constant value: {value}")
 
-proc convertGeneratorexpToNim(node: nil = nil): nil = 
+proc convertGeneratorexpToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.GeneratorExp):
     raise ValueError("Input must be an ast.GeneratorExp node")
   target = node.elt
@@ -566,7 +565,7 @@ proc convertGeneratorexpToNim(node: nil = nil): nil =
   nim_code += convert_ast_node_to_nim(target)
   return nim_code
 
-proc convertExprToNim(expr_node: nil = nil): nil = 
+proc convertExprToNim(expr_node: Option[nil] = none[nil]): nil = 
   if isinstance(expr_node, ast.BinOp):
     return fmt"({convert_expr_to_nim(expr_node.left)} {convert_op_to_nim(expr_node.op)} {convert_expr_to_nim(expr_node.right)})"
   elif isinstance(expr_node, ast.Name):
@@ -604,7 +603,7 @@ proc convertExprToNim(expr_node: nil = nil): nil =
   else:
     raise ValueError(fmt"Unsupported expression node: {type(expr_node).__name__}")
 
-proc convertCallToNim(node: nil = nil): nil = 
+proc convertCallToNim(node: Option[nil] = none[nil]): nil = 
   if not isinstance(node, ast.Call):
     raise ValueError("Input must be an ast.Call node")
   func = convert_expr_to_nim(node.func)
@@ -613,7 +612,7 @@ proc convertCallToNim(node: nil = nil): nil =
   var nim_args: string = ", ".join(args + keywords)
   return fmt"{func}({nim_args})"
 
-proc convertOpToNim(op_node: nil = nil): nil = 
+proc convertOpToNim(op_node: Option[nil] = none[nil]): nil = 
   if isinstance(op_node, ast.Add):
     return "+"
   elif isinstance(op_node, ast.Sub):
